@@ -1,70 +1,101 @@
-# Getting Started with Create React App
+# Librería Online – Frontend II (Semana 4)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Actividad formativa de **Desarrollo Frontend II (PFY2202)**: "Utilizando tecnologías de integración entre frontend y backend".
 
-## Available Scripts
+Tienda de libros donde las personas exploran categorías y ven los libros de cada una. Los datos vienen de una **API REST mock** creada con [MSW (Mock Service Worker)](https://mswjs.io/) y la navegación usa **React Router**.
 
-In the project directory, you can run:
+**Autora:** Francisca Valenzuela
 
-### `npm start`
+## Tecnologías
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- React 19 + Vite
+- React Router (`HashRouter`)
+- MSW 2 como API REST mock
+- HTML, CSS y JavaScript
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Cómo ejecutar
 
-### `npm test`
+Requisitos: Node.js instalado.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+npm install
+npm run dev
+```
 
-### `npm run build`
+Con la configuración de `base`, la aplicación queda en:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+http://localhost:5173/libreria-francisca-valenzuela-pfy2202/
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Para probar la versión construida (igual a la que se publica):
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+npm run build
+npm run preview
+```
 
-### `npm run eject`
+## API mock (MSW)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+El mock se activa automáticamente al iniciar la aplicación (tanto en desarrollo como en la versión construida), por lo que no hay que levantar ningún servidor aparte. Las respuestas llevan un retraso simulado para poder ver los indicadores de carga.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+| Método | Ruta | Descripción | Retraso |
+|---|---|---|---|
+| GET | `/api/categories` | Lista de categorías | 800 ms |
+| GET | `/api/books?genre=<id>` | Libros de una categoría | 1000 ms |
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Las definiciones están en `src/mocks/handlers.js`.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Estructura del proyecto
 
-## Learn More
+```
+src/
+├── components/
+│   ├── ErrorMessage.jsx   # Mensajes de error según el tipo de fallo
+│   └── Loader.jsx         # Indicador de carga
+├── hooks/
+│   └── useApi.js          # Estado de la petición: datos, carga, error y reintento
+├── mocks/
+│   ├── browser.js         # Configuración del worker de MSW
+│   └── handlers.js        # Endpoints del mock
+├── pages/
+│   ├── Categorias.jsx     # Listado de categorías (inicio)
+│   ├── Libros.jsx         # Libros de una categoría
+│   └── NotFound.jsx       # Página 404
+├── services/
+│   └── api.js             # Cliente HTTP con manejo de errores y caché
+├── App.jsx                # Rutas de la aplicación
+└── main.jsx               # Punto de entrada (activa MSW y el router)
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Rutas
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+| Ruta | Página |
+|---|---|
+| `/#/` | Categorías |
+| `/#/categoria/:genre` | Libros de la categoría (por ejemplo `/#/categoria/ficcion`) |
+| cualquier otra | Página no encontrada |
 
-### Code Splitting
+Se usa `HashRouter` para que las rutas funcionen al recargar la página en GitHub Pages.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Funcionamiento de la integración
 
-### Analyzing the Bundle Size
+- **Control de carga:** cada petición muestra un indicador mientras espera la respuesta y lo retira al terminar, ya sea con datos o con error.
+- **Manejo de errores:** se distinguen el error 404 (recurso inexistente), los errores 5xx (falla del servidor), otros errores HTTP y la falta de conexión. Cada uno muestra un mensaje claro y ofrece alternativas: **Reintentar** (cuando tiene sentido) y **Volver a categorías**.
+- **Estados vacíos:** si una categoría no tiene libros, se informa con un mensaje en lugar de dejar la pantalla en blanco.
+- **Optimización:** `src/services/api.js` guarda en memoria la promesa de cada URL, así que una misma consulta no se repite al navegar entre páginas. Las peticiones fallidas no se guardan, para que el reintento funcione. Además, `useApi` evita actualizar el estado si el componente ya se desmontó.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Casos de prueba incluidos
 
-### Making a Progressive Web App
+| Qué probar | Resultado esperado |
+|---|---|
+| Entrar al inicio | Indicador "Cargando categorías..." y luego las 6 categorías |
+| Ficción, Ciencia Ficción, Fantasía, Misterio | Lista de libros con autor y precio en CLP |
+| Drama | Mensaje "No hay libros disponibles en esta categoría por el momento" (lista vacía a propósito) |
+| Terror | Error 500 simulado con botón **Reintentar** |
+| `/#/categoria/inexistente` | Error 404 "No encontrado" (sin botón de reintentar) |
+| `/#/ruta-que-no-existe` | Página no encontrada |
+| Volver al inicio tras visitarlo | Las categorías aparecen sin nueva espera (caché) |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+> Las categorías **Drama** y **Terror** existen a propósito para demostrar la lista vacía y el manejo de error 500.
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

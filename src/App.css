@@ -1,38 +1,64 @@
-.App {
-  text-align: center;
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f5f7;
+  color: #222;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
+.app { min-height: 100vh; display: flex; flex-direction: column; }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.header {
+  background: #1f2a44;
+  color: #fff;
+  padding: 1rem 2rem;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
+.header h1 { margin: 0; font-size: 1.4rem; }
+.header a { color: #cfd8ff; text-decoration: none; font-weight: 600; }
+.header a.active { color: #fff; border-bottom: 2px solid #fff; }
 
-.App-link {
-  color: #61dafb;
-}
+.main { flex: 1; max-width: 960px; width: 100%; margin: 0 auto; padding: 2rem 1rem; }
+.footer { text-align: center; padding: 1rem; color: #777; font-size: 0.85rem; }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.grid {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
 }
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+.card a { color: inherit; text-decoration: none; display: block; }
+.card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+.card h3 { margin-top: 0; }
+.price { font-weight: 700; color: #1f7a3d; }
+
+.back { display: inline-block; margin-bottom: 0.5rem; color: #1f2a44; }
+
+.loader { text-align: center; padding: 2rem; }
+.spinner {
+  width: 40px; height: 40px; margin: 0 auto 0.75rem;
+  border: 4px solid #d9dce5; border-top-color: #1f2a44;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-box {
+  background: #fdecea; border: 1px solid #f5b5ae; color: #8a1f17;
+  padding: 1.5rem; border-radius: 10px; text-align: center;
+}
+.error-actions { display: flex; gap: 0.75rem; justify-content: center; margin-top: 1rem; }
+.error-actions button, .link-button {
+  background: #1f2a44; color: #fff; border: none; border-radius: 6px;
+  padding: 0.55rem 1rem; font-size: 0.95rem; cursor: pointer; text-decoration: none;
+}
+.empty { text-align: center; color: #666; padding: 2rem; }
