@@ -25,7 +25,7 @@ npm run dev
 Con la configuración de `base`, la aplicación queda en:
 
 ```
-http://localhost:5173/libreria-francisca-valenzuela-pfy2202/
+http://localhost:5173/Libreria-francisca-valenzuela-pfy2202/
 ```
 
 Para probar la versión construida (igual a la que se publica):

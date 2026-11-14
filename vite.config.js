@@ -3,5 +3,5 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/hospital-francisca-valenzuela-pfy2202/',
+  base: '/Libreria-francisca-valenzuela-pfy2202/',
 });
